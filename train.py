@@ -452,7 +452,7 @@ def train(H, test_images):
     (config, loss, accuracy, summary_op, train_op,
      smooth_op, global_step, learning_rate) = build(H, q)
 
-    saver = tf.train.Saver(max_to_keep=None)
+    saver = tf.train.Saver(max_to_keep=H['max_checkpoints_to_keep'])
     writer = tf.summary.FileWriter(
         logdir=H['save_dir'],
         flush_secs=10
@@ -540,6 +540,7 @@ def main():
     parser.add_argument('--hypes', required=True, type=str)
     parser.add_argument('--max_iter', required=False, type=int, default=None)
     parser.add_argument('--logdir', default='output', type=str)
+    parser.add_argument('--max_checkpoints_to_keep', default=None, type=int)
     args = parser.parse_args()
     with open(args.hypes, 'r') as f:
         H = json.load(f)
@@ -553,6 +554,7 @@ def main():
         datetime.datetime.now().strftime('%Y_%m_%d_%H.%M'))
     if args.weights is not None:
         H['solver']['weights'] = args.weights
+    H['max_checkpoints_to_keep'] = args.max_checkpoints_to_keep
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
     train(H, test_images=[])
 
